@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ES2015",
+    "moduleDetection": "legacy",
+    "lib": ["ES2020"],
+    "types": ["@figma/plugin-typings"],
+    "strict": true,
+    "noEmitOnError": true
+  },
+  "include": ["code.ts"]
+}

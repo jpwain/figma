@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body { margin: 0; padding: 0; height: auto; min-height: 0; }
+    #plugin-root { height: auto; }
+    body {
+      font: 12px Inter, system-ui, sans-serif;
+      background: var(--figma-color-bg, #fff);
+      color: var(--figma-color-text, #1e1e1e);
+    }
+    main { padding: 12px; }
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      font: inherit;
+      background: var(--figma-color-bg-secondary, #f5f5f5);
+      color: inherit;
+      border: 1px solid var(--figma-color-border, #e6e6e6);
+      border-radius: 4px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    textarea::placeholder {
+      color: var(--figma-color-text-secondary, #757575);
+    }
+    .loop-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    #loop-toggle {
+      margin: 0;
+      accent-color: var(--figma-color-bg-brand, #0d99ff);
+    }
+    footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--figma-color-border, #e6e6e6);
+    }
+    #status {
+      flex: 1;
+      min-width: 0;
+      font-size: 11px;
+      color: var(--figma-color-text-secondary, #757575);
+    }
+    button {
+      flex-shrink: 0;
+      padding: 7px 12px;
+      font: inherit;
+      font-weight: 500;
+      border: 0;
+      border-radius: 4px;
+      background: var(--figma-color-bg-brand, #0d99ff);
+      color: var(--figma-color-text-onbrand, #fff);
+      cursor: pointer;
+    }
+    button:disabled {
+      background: var(--figma-color-bg-disabled, #e6e6e6);
+      color: var(--figma-color-text-disabled, #999);
+      cursor: default;
+    }
+    textarea:focus-visible, input:focus-visible, button:focus-visible {
+      outline: 2px solid var(--figma-color-border-selected, #0d99ff);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="plugin-root">
+    <main>
+      <textarea id="text-input" aria-label="Text lines" placeholder="Paste your lines here&#10;Each line maps to a selected text layer"></textarea>
+      <label class="loop-field">
+        <input id="loop-toggle" type="checkbox">
+        Loop pasting
+      </label>
+    </main>
+    <footer>
+      <span id="status" role="status">Select text layers</span>
+      <button id="paste-btn" type="button" disabled>Paste</button>
+    </footer>
+  </div>
+  <script>
+    var lastReportedHeight = 0
+    var resizeRaf = 0
+    var textCount = 0
+    var pasting = false
+
+    function measurePanelHeight() {
+      var root = document.getElementById('plugin-root')
+      if (!root) return 0
+      return Math.ceil(root.getBoundingClientRect().height)
+    }
+
+    function reportHeight() {
+      var h = measurePanelHeight()
+      if (h && h !== lastReportedHeight) {
+        lastReportedHeight = h
+        parent.postMessage({ pluginMessage: { type: 'resize', height: h } }, '*')
+      }
+    }
+
+    var root = document.getElementById('plugin-root')
+    if (root && typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(function() {
+        if (resizeRaf) cancelAnimationFrame(resizeRaf)
+        resizeRaf = requestAnimationFrame(reportHeight)
+      }).observe(root)
+    }
+
+    var textarea = document.getElementById('text-input')
+    var pasteBtn = document.getElementById('paste-btn')
+    var statusLabel = document.getElementById('status')
+    var loopToggle = document.getElementById('loop-toggle')
+
+    function getLineCount() {
+      return textarea.value.split('\n').filter(function(line) {
+        return line.trim().length > 0
+      }).length
+    }
+
+    function isLooping() {
+      return loopToggle && loopToggle.checked === true
+    }
+
+    function updateUI() {
+      var lineCount = getLineCount()
+      var loop = isLooping()
+      var canPaste = textCount > 0 && lineCount > 0 && !pasting
+
+      if (canPaste) {
+        pasteBtn.removeAttribute('disabled')
+      } else {
+        pasteBtn.setAttribute('disabled', '')
+      }
+
+      if (pasting) {
+        statusLabel.textContent = 'Pasting...'
+      } else if (textCount === 0) {
+        statusLabel.textContent = 'Select text layers'
+      } else if (lineCount === 0) {
+        statusLabel.textContent = textCount + ' layer' + (textCount === 1 ? '' : 's') + ' selected'
+      } else if (loop) {
+        statusLabel.textContent = textCount + ' layer' + (textCount === 1 ? '' : 's') + ' (looping ' + lineCount + ' line' + (lineCount === 1 ? '' : 's') + ')'
+      } else {
+        var pasteCount = Math.min(lineCount, textCount)
+        statusLabel.textContent = pasteCount + ' of ' + textCount + ' layer' + (textCount === 1 ? '' : 's')
+      }
+    }
+
+    textarea.addEventListener('input', updateUI)
+    if (loopToggle) loopToggle.addEventListener('change', updateUI)
+
+    function doPaste() {
+      if (pasting || !textarea.value.trim() || textCount === 0) return
+      pasting = true
+      updateUI()
+      parent.postMessage({
+        pluginMessage: {
+          type: 'paste',
+          text: textarea.value,
+          loop: isLooping()
+        }
+      }, '*')
+    }
+
+    if (pasteBtn) {
+      pasteBtn.addEventListener('click', doPaste)
+    }
+
+    window.onmessage = function(event) {
+      var msg = event.data.pluginMessage
+      if (!msg) return
+      if (msg.type === 'selection') {
+        textCount = msg.count
+        updateUI()
+      }
+      if (msg.type === 'paste-done') {
+        pasting = false
+        updateUI()
+      }
+    }
+
+    updateUI()
+    parent.postMessage({ pluginMessage: { type: 'ready' } }, '*')
+  </script>
+</body>
+</html>

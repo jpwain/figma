@@ -1,0 +1,11 @@
+{
+  "name": "MultiPaste",
+  "id": "f721ea5e-dd35-4514-ba83-b8121b61ec79",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma"],
+  "networkAccess": { "allowedDomains": ["none"] },
+  "relaunchButtons": [{ "command": "f721ea5e-dd35-4514-ba83-b8121b61ec79", "name": "MultiPaste" }]
+}

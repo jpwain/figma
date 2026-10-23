@@ -1,0 +1,15 @@
+{
+  "name": "multipaste",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Paste lines of text into selected Figma text layers.",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.142.0",
+    "typescript": "^7.0.2"
+  }
+}
