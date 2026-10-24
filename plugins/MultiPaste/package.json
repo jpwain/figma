@@ -1,6 +1,6 @@
 {
   "name": "multipaste",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Paste lines of text into selected Figma text layers.",
   "scripts": {
