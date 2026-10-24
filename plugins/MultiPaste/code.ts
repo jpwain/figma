@@ -1,4 +1,4 @@
-const TOOL_ID = 'f721ea5e-dd35-4514-ba83-b8121b61ec79'
+const TOOL_ID = '1695891988660544681'
 const DISPLAY_NAME = 'MultiPaste'
 
 figma.root.setRelaunchData({ [TOOL_ID]: DISPLAY_NAME })

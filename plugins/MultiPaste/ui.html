@@ -147,11 +147,10 @@
         statusLabel.textContent = 'Select text layers'
       } else if (lineCount === 0) {
         statusLabel.textContent = textCount + ' layer' + (textCount === 1 ? '' : 's') + ' selected'
-      } else if (loop) {
-        statusLabel.textContent = textCount + ' layer' + (textCount === 1 ? '' : 's') + ' (looping ' + lineCount + ' line' + (lineCount === 1 ? '' : 's') + ')'
       } else {
-        var pasteCount = Math.min(lineCount, textCount)
-        statusLabel.textContent = pasteCount + ' of ' + textCount + ' layer' + (textCount === 1 ? '' : 's')
+        statusLabel.textContent = lineCount + ' line' + (lineCount === 1 ? '' : 's')
+          + (loop ? ' looping to ' : ' to ')
+          + textCount + ' layer' + (textCount === 1 ? '' : 's')
       }
     }
 
