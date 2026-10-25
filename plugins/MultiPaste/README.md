@@ -1,11 +1,10 @@
 # MultiPaste
 
-Paste lines of text into selected Figma text layers, in Figma's selection order.
+Paste lines of text into selected text layers, in selection order.
 
-Enable looping to repeat the lines across the layer selection. 
+Enable looping to repeat the lines across the layer selection.
 
 ![Preview](preview.png)
-
 
 ## Build and import
 
@@ -15,4 +14,4 @@ Requires Node.js, npm, and the Figma desktop app.
 
 ## Develop
 
-`npm run watch` for TypeScript changes to rebuild automatically. After saving changes to the code or UI, close and reopen the plugin in Figma. Run `npm run typecheck` to check the TypeScript without emitting JavaScript.
+`npm run watch` for code changes to rebuild automatically. After saving changes to the code or UI, close and reopen the plugin in Figma. Run `npm run typecheck` to check the TypeScript without emitting JavaScript.
