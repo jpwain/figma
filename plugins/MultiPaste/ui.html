@@ -12,16 +12,31 @@
     }
     main { padding: 12px; }
     textarea {
+      --text-line-height: 24px;
       display: block;
       width: 100%;
-      min-height: 160px;
+      min-height: 240px;
       resize: vertical;
       font: inherit;
-      background: var(--figma-color-bg-secondary, #f5f5f5);
+      line-height: var(--text-line-height);
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow: auto;
+      background-color: var(--figma-color-bg-secondary, #f5f5f5);
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(var(--text-line-height) - 1px),
+        var(--figma-color-border, #e6e6e6) calc(var(--text-line-height) - 1px),
+        var(--figma-color-border, #e6e6e6) var(--text-line-height)
+      );
+      background-origin: padding-box;
+      background-clip: padding-box;
+      background-attachment: local;
       color: inherit;
       border: 1px solid var(--figma-color-border, #e6e6e6);
       border-radius: 4px;
-      padding: 8px;
+      padding: 0 8px;
       box-sizing: border-box;
     }
     textarea::placeholder {
@@ -35,8 +50,34 @@
       cursor: pointer;
     }
     #loop-toggle {
+      appearance: none;
+      display: grid;
+      place-content: center;
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
       margin: 0;
-      accent-color: var(--figma-color-bg-brand, #0d99ff);
+      border: 1px solid var(--figma-color-border-strong, #757575);
+      border-radius: 2px;
+      background: var(--figma-color-bg, #fff);
+      cursor: inherit;
+    }
+    #loop-toggle:checked {
+      background: var(--figma-color-bg-selected-strong, #0d99ff);
+      border-color: transparent;
+    }
+    #loop-toggle:checked::before {
+      content: '';
+      width: 4px;
+      height: 7px;
+      margin-top: -2px;
+      border: solid var(--figma-color-icon-onselected-strong, #fff);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    @media (forced-colors: active) {
+      #loop-toggle { appearance: auto; }
+      #loop-toggle::before { content: none; }
     }
     footer {
       display: flex;
@@ -76,7 +117,7 @@
 <body>
   <div id="plugin-root">
     <main>
-      <textarea id="text-input" aria-label="Text lines" placeholder="Paste your lines here&#10;Each line maps to a selected text layer"></textarea>
+      <textarea id="text-input" wrap="off" aria-label="Text lines" placeholder="Put your source lines here&#10;Each one goes to a selected text layer"></textarea>
       <label class="loop-field">
         <input id="loop-toggle" type="checkbox">
         Loop pasting
